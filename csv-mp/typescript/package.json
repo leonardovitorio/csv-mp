@@ -1,0 +1,26 @@
+{
+  "name": "csv-mp",
+  "version": "0.8.0-alpha",
+  "description": "CSV MultiPart Protocol - Human readable data serialization with multiple tables, references, and binary assets",
+  "main": "dist/parser.js",
+  "types": "dist/types.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "keywords": [
+    "csv",
+    "serialization",
+    "data-format",
+    "multipart"
+  ],
+  "author": "csv-mp-team",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0"
+  }
+}
