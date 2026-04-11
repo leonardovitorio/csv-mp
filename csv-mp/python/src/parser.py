@@ -1,6 +1,6 @@
 """
 CSV-MP Python Parser and Serializer
-Version: 0.8.0-alpha
+Version: 0.2.0-alpha
 License: CC0 1.0 (Public Domain)
 """
 
@@ -512,7 +512,7 @@ class CsvMpParser:
                   binary_parts: Optional[List[BinaryPart]] = None,
                   text_parts: Optional[List[TextPart]] = None) -> str:
         """Serialize CSV-MP data to string"""
-        output = '# CSV-MP v0.8 Manifesto\n'
+        output = '# CSV-MP v0.2 Manifesto\n'
         output += '&|type|description|count|format|author|version|hash\n'
         
         for entry in manifest:
@@ -653,7 +653,7 @@ def to_csv_mp(data: Dict[str, Any], options: Optional[Dict[str, str]] = None) ->
     Converts plain Python dictionaries to CSV-MP format
     """
     author = options.get('author', 'csv-mp') if options else 'csv-mp'
-    version = options.get('version', '0.8') if options else '0.8'
+    version = options.get('version', '0.2') if options else '0.2'
     
     manifest: List[ManifestEntry] = []
     tables: List[Table] = []

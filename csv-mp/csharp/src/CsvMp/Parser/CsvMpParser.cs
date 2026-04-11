@@ -1,5 +1,5 @@
 // CSV-MP C# Implementation - Parser and Serializer
-// Version: 0.8.0-alpha
+// Version: 0.2.0-alpha
 // License: CC0 1.0 (Public Domain)
 
 using System.Text;
@@ -189,7 +189,7 @@ public class CsvMpParser
     public string Serialize(List<ManifestEntry> manifest, List<Table> tables, List<BinaryPart>? bps = null, List<TextPart>? tps = null)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("# CSV-MP v0.8 Manifesto").AppendLine($"# Generated: {DateTime.UtcNow:O}").AppendLine().AppendLine("&|type|description|count|format|author|version|hash");
+        sb.AppendLine("# CSV-MP v0.2 Manifesto").AppendLine($"# Generated: {DateTime.UtcNow:O}").AppendLine().AppendLine("&|type|description|count|format|author|version|hash");
         foreach (var e in manifest) sb.AppendLine($"{e.Index}|{e.Type}|{e.Description ?? ""}|{e.Count}|{e.Format}|{e.Author ?? ""}|{e.Version}|{e.Hash ?? ""}");
         sb.AppendLine();
         foreach (var t in tables)
@@ -269,7 +269,7 @@ public static class CsvMp
     public static string ToCsvMp(Dictionary<string, object> data, string? author = null, string? version = null)
     {
         author ??= "csv-mp";
-        version ??= "0.8";
+        version ??= "0.2";
         var manifest = new List<ManifestEntry>();
         var tables = new List<Table>();
         var partIndex = 0;

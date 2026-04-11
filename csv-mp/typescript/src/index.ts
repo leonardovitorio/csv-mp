@@ -1,6 +1,6 @@
 /**
  * CSV-MP TypeScript Package
- * Version: 0.8.0-alpha
+ * Version: 0.2.0-alpha
  */
 
 export {

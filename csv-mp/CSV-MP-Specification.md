@@ -1,5 +1,5 @@
 # CSV-MP: Complete Data Structuring Documentation
-**Version:** 0.8.0-alpha  
+**Version:** 0.2.0-alpha  
 **Status:** Official Specification  
 **License:** CC0 1.0 (Public Domain)
 
@@ -109,7 +109,7 @@ FILE.csv.mp
 
 ```
 # Comments are optional (start with #)
-# CSV-MP v0.8 Manifesto
+# CSV-MP v0.2 Manifesto
 # Generated: 2024-01-20T10:30:00Z
 
 &|type|description|count|format|author|version|hash
@@ -144,16 +144,16 @@ FILE.csv.mp
 ### 3.4 Complete Example
 
 ```
-# CSV-MP v0.8 Manifesto
+# CSV-MP v0.2 Manifesto
 # Generated: 2024-01-20T10:30:00Z
 # Author: csv-mp-team
 # License: CC0 1.0
 
 &|type|description|count|format|author|version|hash
-0|User|User data|3|csv/default|csv-mp-team|0.8|
-1|Order|Purchase orders|5|csv/default|csv-mp-team|0.8|
-2|Avatar|User avatar|1|image/png|csv-mp-team|0.8|
-3|Config|System settings|1|application/json|csv-mp-team|0.8|
+0|User|User data|3|csv/default|csv-mp-team|0.2|
+1|Order|Purchase orders|5|csv/default|csv-mp-team|0.2|
+2|Avatar|User avatar|1|image/png|csv-mp-team|0.2|
+3|Config|System settings|1|application/json|csv-mp-team|0.2|
 ```
 
 ---
@@ -554,9 +554,9 @@ CSV-MP uses a single generic type `:Reference` that can reference:
 ### 10.1 Example: Basic Users
 
 ```
-# CSV-MP v0.8 Manifesto
+# CSV-MP v0.2 Manifesto
 &|type|description|count|format|author|version|hash
-0|User|User data|3|csv/default|csv-mp-team|0.8|
+0|User|User data|3|csv/default|csv-mp-team|0.2|
 
 &:id:int,name:string,email:string,age:int,active:boolean
 0,1,Alice Silva,alice@email.com,30,true
@@ -567,11 +567,11 @@ CSV-MP uses a single generic type `:Reference` that can reference:
 ### 10.2 Example: Game Save
 
 ```
-# CSV-MP v0.8 Manifesto
+# CSV-MP v0.2 Manifesto
 &|type|description|count|format|author|version|hash
-0|Player|Player character|1|csv/default|game-dev|0.8|
-1|Inventory|Inventory items|5|csv/default|game-dev|0.8|
-2|Avatar|Character avatar|1|image/png|game-dev|0.8|
+0|Player|Player character|1|csv/default|game-dev|0.2|
+1|Inventory|Inventory items|5|csv/default|game-dev|0.2|
+2|Avatar|Character avatar|1|image/png|game-dev|0.2|
 
 &:id:int,name:string,level:int,experience:number,gold:int,avatar:Reference
 0,1,HeroKnight,42,125000.5,50000,@Avatar.0
@@ -591,10 +591,10 @@ CSV-MP uses a single generic type `:Reference` that can reference:
 ### 10.3 Example: IoT Telemetry
 
 ```
-# CSV-MP v0.8 Manifesto
+# CSV-MP v0.2 Manifesto
 &|type|description|count|format|author|version|hash
-0|Vehicle|Vehicle data|1|csv/default|iot-system|0.8|
-1|SensorReading|Sensor readings|5|csv/default|iot-system|0.8|
+0|Vehicle|Vehicle data|1|csv/default|iot-system|0.2|
+1|SensorReading|Sensor readings|5|csv/default|iot-system|0.2|
 
 &:vin:string,model:string,last_seen:datetime,battery_level:number
 0,ABC123,Ford Transit,2024-01-20T10:30:00Z,85.5
@@ -610,9 +610,9 @@ CSV-MP uses a single generic type `:Reference` that can reference:
 ### 10.4 Example: Type Validation
 
 ```
-# CSV-MP v0.8 Manifesto
+# CSV-MP v0.2 Manifesto
 &|type|description|count|format|author|version|hash
-0|TypeExamples|All BaseTypes|5|csv/default|csv-mp-team|0.8|
+0|TypeExamples|All BaseTypes|5|csv/default|csv-mp-team|0.2|
 
 &:id:int,string_val:string,number_val:number,long_val:long,int_val:int,bool_val:boolean,date_val:date,datetime_val:datetime,ref:Reference
 0,1,Hello World,3.14159,9223372036854775807,2147483647,true,"2024-01-20","2024-01-20T10:30:00Z",@Binary.0
@@ -641,7 +641,7 @@ CSV-MP uses a single generic type `:Reference` that can reference:
 
 ---
 
-**Document Version:** 0.8.0-alpha  
+**Document Version:** 0.2.0-alpha  
 **License:** CC0 1.0 (Public Domain)  
 **Contact:** csv-mp@example.com  
 **GitHub:** https://github.com/csv-mp/csv-mp

@@ -1,6 +1,6 @@
 """
 CSV-MP Python Package
-Version: 0.8.0-alpha
+Version: 0.2.0-alpha
 """
 
 from .types import (
@@ -34,7 +34,7 @@ from .parser import (
     write_csv_mp
 )
 
-__version__ = "0.8.0-alpha"
+__version__ = "0.2.0-alpha"
 __all__ = [
     # Types
     "BaseType",

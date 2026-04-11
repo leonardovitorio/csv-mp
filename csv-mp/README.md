@@ -1,6 +1,6 @@
 # CSV-MP (CSV MultiPart Protocol)
 
-Implementação de referência do protocolo CSV-MP v0.8.0-alpha em três linguagens: TypeScript, Python e C#.
+Implementação de referência do protocolo CSV-MP v0.2.0-alpha em três linguagens: TypeScript, Python e C#.
 
 ## Visão Geral
 
@@ -40,4 +40,4 @@ CC0 1.0 (Domínio Público)
 
 ## Versão
 
-0.8.0-alpha
+0.2.0-alpha

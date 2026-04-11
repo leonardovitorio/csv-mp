@@ -192,7 +192,7 @@ The simple API automatically infers column types from your data:
 | Option | Default | Description |
 |--------|---------|-------------|
 | `author` | `'csv-mp'` | Author name for manifesto |
-| `version` | `'0.8'` | Schema version |
+| `version` | `'0.2'` | Schema version |
 | `description` | `'{Type} data'` | Part description |
 
 ### Validation Configuration

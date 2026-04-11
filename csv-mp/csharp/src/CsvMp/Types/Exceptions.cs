@@ -1,5 +1,5 @@
 // CSV-MP C# Implementation
-// Version: 0.8.0-alpha
+// Version: 0.2.0-alpha
 // License: CC0 1.0 (Public Domain)
 
 namespace CsvMp.Types;
