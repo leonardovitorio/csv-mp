@@ -51,7 +51,7 @@ export interface ManifestEntry {
   type: string;
   description?: string;
   count: number;
-  format: string;
+  contentType: string;
   author?: string;
   version: string;
   hash?: string;

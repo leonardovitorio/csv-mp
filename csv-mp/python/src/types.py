@@ -37,7 +37,7 @@ class CollectionType(IntEnum):
 
 class PartFormat:
     """Part formats supported by CSV-MP"""
-    CSV_DEFAULT = 'csv/default'
+    TEXT_CSV = 'text/csv'
     IMAGE_PNG = 'image/png'
     IMAGE_JPEG = 'image/jpeg'
     APPLICATION_JSON = 'application/json'
@@ -51,7 +51,7 @@ class ManifestEntry:
     index: int
     type: str
     count: int
-    format: str
+    contentType: str
     version: str
     description: Optional[str] = None
     author: Optional[str] = None

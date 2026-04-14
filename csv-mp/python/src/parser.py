@@ -139,7 +139,7 @@ class CsvMpParser:
                 type=columns[1],
                 description=columns[2] or None,
                 count=int(columns[3]),
-                format=columns[4],
+                contentType=columns[4],
                 author=columns[5] or None,
                 version=columns[6],
                 hash=columns[7] or None
@@ -171,7 +171,7 @@ class CsvMpParser:
         
         # Find corresponding manifest entry
         table_name = self._infer_table_name(columns, manifest)
-        manifest_entry = next((m for m in manifest if m.type == table_name and m.format == 'csv/default'), None)
+        manifest_entry = next((m for m in manifest if m.type == table_name and m.contentType == 'text/csv'), None)
         
         if not manifest_entry:
             raise FormatException(f"Manifest entry not found for table '{table_name}'")
@@ -400,7 +400,7 @@ class CsvMpParser:
         """Infer table name from columns or manifest"""
         # Try to match with manifest entries
         for entry in manifest:
-            if entry.format == 'csv/default':
+            if entry.contentType == 'text/csv':
                 return entry.type
         return 'Unknown'
     
@@ -513,13 +513,13 @@ class CsvMpParser:
                   text_parts: Optional[List[TextPart]] = None) -> str:
         """Serialize CSV-MP data to string"""
         output = '# CSV-MP v0.2 Manifesto\n'
-        output += '&|type|description|count|format|author|version|hash\n'
+        output += '&|type:string|description:string|count:number|contentType:string|author:string|version:string|hash:string\n'
         
         for entry in manifest:
             desc = entry.description or ''
             author = entry.author or ''
             hash_val = entry.hash or ''
-            output += f'{entry.index}|{entry.type}|{desc}|{entry.count}|{entry.format}|{author}|{entry.version}|{hash_val}\n'
+            output += f'{entry.index}|{entry.type}|{desc}|{entry.count}|{entry.contentType}|{author}|{entry.version}|{hash_val}\n'
         
         output += '\n'
         
@@ -709,7 +709,7 @@ def to_csv_mp(data: Dict[str, Any], options: Optional[Dict[str, str]] = None) ->
                     type=key,
                     description=f'{key} data',
                     count=len(value),
-                    format='csv/default',
+                    contentType='text/csv',
                     author=author,
                     version=version,
                     hash=''

@@ -59,9 +59,9 @@ CSV-MP is designed with organic correlation between components:
 ```
 FILE.csv.mp
 ├── [MANIFESTO]
-│   &|type|description|count|format|author|version|hash
-│   0|User|User data|100|csv/default|dev01|1.0|abc...
-│   1|Order|Order data|500|csv/default|dev01|1.0|def...
+│   &|type|description|count|ContentType|author|version|hash
+│   0|User|User data|100|text/csv|dev01|1.0|abc...
+│   1|Order|Order data|500|text/csv|dev01|1.0|def...
 │   2|Avatar|User avatar|1|image/png|dev01|1.0|ghi...
 ├── [PART 0: User - Table]
 │   &:id:int,name:string,email:string,avatar:Reference
@@ -112,9 +112,9 @@ FILE.csv.mp
 # CSV-MP v0.2 Manifesto
 # Generated: 2024-01-20T10:30:00Z
 
-&|type|description|count|format|author|version|hash
-0|User|User data|100|csv/default|dev01|1.0|abc123...
-1|Order|Order data|500|csv/default|dev01|1.0|def456...
+&|type|description|count|ContentType|author|version|hash
+0|User|User data|100|text/csv|dev01|1.0|abc123...
+1|Order|Order data|500|text/csv|dev01|1.0|def456...
 2|Avatar|User avatar|1|image/png|dev01|1.0|ghi789...
 ```
 
@@ -126,7 +126,7 @@ FILE.csv.mp
 | type        | string | Yes      | Type name (User, Order, Avatar)          |
 | description | string | No       | Human-readable description of the part   |
 | count       | int    | Yes      | Number of rows (table) or bytes          |
-| format      | string | Yes      | Format (csv/default, image/png)          |
+| ContentType | string | Yes      | Content-Type (text/csv, image/png)       |
 | author      | string | No       | Author/creator of the part               |
 | version     | string | Yes      | Schema version (1.0, 2.0, etc.)          |
 | hash        | string | No       | SHA-256 hash of the part (empty if not)  |
@@ -138,7 +138,7 @@ FILE.csv.mp
 - `first_index_must_be`: 0
 - `type_must_be_unique`: "within same file"
 - `count_must_match`: "actual row/byte count"
-- `format_must_be`: "csv/default, image/png, text/json, etc."
+- `ContentType_must_be`: "text/csv, image/png, application/json, etc."
 - `hash_if_present_must_be`: "SHA-256 hex string (64 chars)"
 
 ### 3.4 Complete Example
@@ -149,9 +149,9 @@ FILE.csv.mp
 # Author: csv-mp-team
 # License: CC0 1.0
 
-&|type|description|count|format|author|version|hash
-0|User|User data|3|csv/default|csv-mp-team|0.2|
-1|Order|Purchase orders|5|csv/default|csv-mp-team|0.2|
+&|type|description|count|ContentType|author|version|hash
+0|User|User data|3|text/csv|csv-mp-team|0.2|
+1|Order|Purchase orders|5|text/csv|csv-mp-team|0.2|
 2|Avatar|User avatar|1|image/png|csv-mp-team|0.2|
 3|Config|System settings|1|application/json|csv-mp-team|0.2|
 ```
@@ -456,9 +456,9 @@ CSV-MP uses a single generic type `:Reference` that can reference:
 
 ```
 # ✅ VALID: Bidirectional reference
-&|type|description|count|format|author|version|hash
-0|User|User data|2|csv/default|dev01|1.0|
-1|Order|Order data|3|csv/default|dev01|1.0|
+&|type|description|count|ContentType|author|version|hash
+0|User|User data|2|text/csv|dev01|1.0|
+1|Order|Order data|3|text/csv|dev01|1.0|
 
 &:id:int,name:string,avatar:Reference
 0,1,Alice,@Avatar.0
@@ -473,9 +473,9 @@ CSV-MP uses a single generic type `:Reference` that can reference:
 # Backward: User is referenced by Order.user ✅
 
 # ❌ INVALID: Reference column is not used
-&|type|description|count|format|author|version|hash
-0|User|User data|2|csv/default|dev01|1.0|
-1|Order|Order data|3|csv/default|dev01|1.0|
+&|type|description|count|ContentType|author|version|hash
+0|User|User data|2|text/csv|dev01|1.0|
+1|Order|Order data|3|text/csv|dev01|1.0|
 
 &:id:int,name:string,avatar:Reference
 0,1,Alice,@Avatar.0
@@ -555,8 +555,8 @@ CSV-MP uses a single generic type `:Reference` that can reference:
 
 ```
 # CSV-MP v0.2 Manifesto
-&|type|description|count|format|author|version|hash
-0|User|User data|3|csv/default|csv-mp-team|0.2|
+&|type|description|count|ContentType|author|version|hash
+0|User|User data|3|text/csv|csv-mp-team|0.2|
 
 &:id:int,name:string,email:string,age:int,active:boolean
 0,1,Alice Silva,alice@email.com,30,true
@@ -568,9 +568,9 @@ CSV-MP uses a single generic type `:Reference` that can reference:
 
 ```
 # CSV-MP v0.2 Manifesto
-&|type|description|count|format|author|version|hash
-0|Player|Player character|1|csv/default|game-dev|0.2|
-1|Inventory|Inventory items|5|csv/default|game-dev|0.2|
+&|type|description|count|ContentType|author|version|hash
+0|Player|Player character|1|text/csv|game-dev|0.2|
+1|Inventory|Inventory items|5|text/csv|game-dev|0.2|
 2|Avatar|Character avatar|1|image/png|game-dev|0.2|
 
 &:id:int,name:string,level:int,experience:number,gold:int,avatar:Reference
@@ -592,9 +592,9 @@ CSV-MP uses a single generic type `:Reference` that can reference:
 
 ```
 # CSV-MP v0.2 Manifesto
-&|type|description|count|format|author|version|hash
-0|Vehicle|Vehicle data|1|csv/default|iot-system|0.2|
-1|SensorReading|Sensor readings|5|csv/default|iot-system|0.2|
+&|type|description|count|ContentType|author|version|hash
+0|Vehicle|Vehicle data|1|text/csv|iot-system|0.2|
+1|SensorReading|Sensor readings|5|text/csv|iot-system|0.2|
 
 &:vin:string,model:string,last_seen:datetime,battery_level:number
 0,ABC123,Ford Transit,2024-01-20T10:30:00Z,85.5
@@ -611,8 +611,8 @@ CSV-MP uses a single generic type `:Reference` that can reference:
 
 ```
 # CSV-MP v0.2 Manifesto
-&|type|description|count|format|author|version|hash
-0|TypeExamples|All BaseTypes|5|csv/default|csv-mp-team|0.2|
+&|type|description|count|ContentType|author|version|hash
+0|TypeExamples|All BaseTypes|5|text/csv|csv-mp-team|0.2|
 
 &:id:int,string_val:string,number_val:number,long_val:long,int_val:int,bool_val:boolean,date_val:date,datetime_val:datetime,ref:Reference
 0,1,Hello World,3.14159,9223372036854775807,2147483647,true,"2024-01-20","2024-01-20T10:30:00Z",@Binary.0

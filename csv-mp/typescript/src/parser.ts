@@ -116,7 +116,7 @@ export class CsvMpParser {
     // Parse header
     const headerLine = lines[lineIndex];
     const headers = headerLine.substring(2).split('|');
-    const expectedHeaders = ['type', 'description', 'count', 'format', 'author', 'version', 'hash'];
+    const expectedHeaders = ['type:string', 'description:string', 'count:number', 'contentType:string', 'author:string', 'version:string', 'hash:string'];
     
     // First column is index, rest are headers
     if (headers.length < 7) {
@@ -159,7 +159,7 @@ export class CsvMpParser {
         type: columns[1],
         description: columns[2] || undefined,
         count: parseInt(columns[3], 10),
-        format: columns[4],
+        contentType: columns[4],
         author: columns[5] || undefined,
         version: columns[6],
         hash: columns[7] || undefined
@@ -197,7 +197,7 @@ export class CsvMpParser {
 
     // Find corresponding manifest entry
     const tableName = this.inferTableName(columns, manifest);
-    const manifestEntry = manifest.find(m => m.type === tableName && m.format === 'csv/default');
+    const manifestEntry = manifest.find(m => m.type === tableName && m.contentType === 'csv/default');
 
     if (!manifestEntry) {
       throw new FormatException(`Manifest entry not found for table '${tableName}'`);
@@ -618,7 +618,7 @@ export class CsvMpParser {
     
     // For now, use the first csv/default entry that hasn't been used
     for (const entry of manifest) {
-      if (entry.format === 'csv/default') {
+      if (entry.contentType === 'csv/default') {
         return entry.type;
       }
     }
@@ -634,7 +634,7 @@ export class CsvMpParser {
     const validReferences = new Set<string>();
 
     for (const entry of manifest) {
-      if (entry.format === 'csv/default') {
+      if (entry.contentType === 'csv/default') {
         // Find corresponding table
         const table = tables.find(t => t.name === entry.type);
         if (table) {
