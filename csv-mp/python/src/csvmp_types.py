@@ -68,12 +68,16 @@ class ColumnDef:
 
 
 @dataclass
-class Table:
-    """Parsed table from CSV-MP"""
+class TablePart:
+    """Parsed table from CSV-MP (renamed from Table for consistency with BinaryPart and TextPart)"""
     name: str
     columns: List[ColumnDef]
     rows: List[List[Any]]
     manifest_entry: ManifestEntry
+
+
+# Alias for backward compatibility
+Table = TablePart
 
 
 @dataclass

@@ -3,13 +3,14 @@ CSV-MP Python Package
 Version: 0.2.0-alpha
 """
 
-from .types import (
+from .csvmp_types import (
     BaseType,
     CollectionType,
     PartFormat,
     ManifestEntry,
     ColumnDef,
-    Table,
+    TablePart,
+    Table,  # Alias for backward compatibility
     BinaryPart,
     TextPart,
     ValidationConfig,

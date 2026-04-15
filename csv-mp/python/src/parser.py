@@ -8,12 +8,18 @@ import re
 import hashlib
 import json
 from typing import List, Dict, Any, Optional, Tuple
-from .types import (
+import sys
+import os
+
+# Add src to path for direct imports
+sys.path.insert(0, os.path.dirname(__file__))
+
+from csvmp_types import (
     BaseType,
     CollectionType,
     ManifestEntry,
     ColumnDef,
-    Table,
+    TablePart,
     BinaryPart,
     TextPart,
     ValidationConfig,
@@ -33,10 +39,39 @@ class CsvMpParser:
         self.config = config or ValidationScenarios.DEFAULT
     
     def parse(self, content: str) -> Dict[str, Any]:
-        """Parse a complete CSV-MP file content"""
+        """
+        Parse a complete CSV-MP file content.
+        Automatically detects between Full Mode (with manifesto) and Lite Mode (direct table).
+        """
         lines = content.split('\n')
         line_index = 0
         
+        # Detectar se é Modo Lite (começa com &: sem manifesto)
+        is_lite_mode = False
+        while line_index < len(lines):
+            line = lines[line_index].strip()
+            if line == '' or line.startswith('#'):
+                line_index += 1
+                continue
+            if line.startswith('&:'):
+                is_lite_mode = True
+            break
+        
+        if is_lite_mode:
+            # MODO LITE: Sem manifesto, apenas tabela para transações rápidas
+            # O nome/tipo da tabela é desconhecido aqui, resolvido pelo contexto do Service no Server
+            tables: List[TablePart] = []
+            table, line_index = self._parse_table(lines, 0, [], is_lite=True)
+            tables.append(table)
+            
+            return {
+                'manifest': [],
+                'tables': tables,
+                'binary_parts': [],
+                'text_parts': []
+            }
+        
+        # MODO PADRÃO: Com manifesto (múltiplos conteúdos)
         # Parse manifesto
         manifest, line_index = self._parse_manifesto(lines, line_index)
         
@@ -44,7 +79,7 @@ class CsvMpParser:
         while line_index < len(lines) and lines[line_index].strip() == '':
             line_index += 1
         
-        tables: List[Table] = []
+        tables: List[TablePart] = []
         binary_parts: List[BinaryPart] = []
         text_parts: List[TextPart] = []
         
@@ -54,7 +89,7 @@ class CsvMpParser:
             
             if line.startswith('&:'):
                 # Table part
-                table, line_index = self._parse_table(lines, line_index, manifest)
+                table, line_index = self._parse_table(lines, line_index, manifest, is_lite=False)
                 tables.append(table)
             elif line.startswith('[PART:'):
                 # Binary part
@@ -155,8 +190,16 @@ class CsvMpParser:
         
         return manifest, line_index
     
-    def _parse_table(self, lines: List[str], start_index: int, manifest: List[ManifestEntry]) -> Tuple[Table, int]:
-        """Parse table section"""
+    def _parse_table(self, lines: List[str], start_index: int, manifest: List[ManifestEntry], is_lite: bool = False) -> Tuple[TablePart, int]:
+        """
+        Parse table section.
+        
+        Args:
+            lines: All lines of the document
+            start_index: Starting line index
+            manifest: List of manifest entries (empty in lite mode)
+            is_lite: True if parsing in lite mode (no manifesto)
+        """
         line_index = start_index
         header_line = lines[line_index]
         
@@ -169,12 +212,35 @@ class CsvMpParser:
         
         line_index += 1
         
-        # Find corresponding manifest entry
-        table_name = self._infer_table_name(columns, manifest)
-        manifest_entry = next((m for m in manifest if m.type == table_name and m.contentType == 'text/csv'), None)
-        
-        if not manifest_entry:
-            raise FormatException(f"Manifest entry not found for table '{table_name}'")
+        # No modo lite, o nome da tabela é desconhecido e será resolvido pelo Service no Server
+        if is_lite:
+            table_name = "unknown"  # Será resolvido pelo contexto do Service
+            manifest_entry = ManifestEntry(
+                index=0,
+                type=table_name,
+                description="Lite mode table - type resolved by server service",
+                count=0,  # Será atualizado após parse
+                contentType='text/csv',
+                author='csv-mp',
+                version='1.0',
+                hash=None
+            )
+        else:
+            # Modo padrão: tenta inferir nome da tabela do manifesto
+            table_name = self._infer_table_name(columns, manifest)
+            manifest_entry = next((m for m in manifest if m.type == table_name and m.contentType == 'text/csv'), None)
+            
+            if not manifest_entry:
+                manifest_entry = ManifestEntry(
+                    index=0,
+                    type=table_name,
+                    description=f"Table: {table_name}",
+                    count=0,
+                    contentType='text/csv',
+                    author='csv-mp',
+                    version='1.0',
+                    hash=None
+                )
         
         # Parse rows
         rows: List[List[Any]] = []
@@ -194,27 +260,35 @@ class CsvMpParser:
             
             values = self._parse_csv_line(line)
             
+            # Detectar se a primeira coluna é índice (nomeada 'idx' ou similar)
+            has_explicit_index = len(columns) > 0 and columns[0].name.lower() in ['idx', 'index', 'row_index', 'id']
+            
             # Validate row index
             row_index = int(values[0])
             if row_index != expected_row_index:
                 raise IndexException(f'Row index sequence error: expected {expected_row_index}, got {row_index}')
             
             # Validate column count
-            if len(values) != len(columns) + 1:
-                raise TypeException(f'Column count mismatch: expected {len(columns) + 1}, got {len(values)}')
+            expected_cols = len(columns) if has_explicit_index else len(columns) + 1
+            if len(values) != expected_cols:
+                raise TypeException(f'Column count mismatch: expected {expected_cols}, got {len(values)}')
             
             # Validate and convert types
-            converted_row = self._convert_row_types(values, columns)
+            converted_row = self._convert_row_types(values, columns, has_explicit_index)
             rows.append(converted_row)
             
             expected_row_index += 1
             line_index += 1
         
-        # Validate row count matches manifesto
-        if self.config.validate_on_read and len(rows) != manifest_entry.count:
+        # Update manifest entry count with actual row count (modo lite)
+        if manifest_entry.count == 0 and len(rows) > 0:
+            manifest_entry.count = len(rows)
+        
+        # Validate row count matches manifesto (only if not in lite mode)
+        if self.config.validate_on_read and manifest_entry.count != 0 and len(rows) != manifest_entry.count:
             raise IntegrityException(f"Row count mismatch: manifesto says {manifest_entry.count}, found {len(rows)}")
         
-        table = Table(
+        table = TablePart(
             name=table_name,
             columns=columns,
             rows=rows,
@@ -328,7 +402,7 @@ class CsvMpParser:
         values.append(current)
         return values
     
-    def _convert_row_types(self, values: List[str], columns: List[ColumnDef]) -> List[Any]:
+    def _convert_row_types(self, values: List[str], columns: List[ColumnDef], has_explicit_index: bool = False) -> List[Any]:
         """Convert row values according to column types"""
         converted: List[Any] = []
         
@@ -336,9 +410,12 @@ class CsvMpParser:
         converted.append(int(values[0]))
         
         # Convert remaining values
+        start_idx = 1 if has_explicit_index else 1
         for i, column in enumerate(columns):
-            value = values[i + 1]
-            converted.append(self._convert_value(value, column))
+            value_idx = start_idx + i
+            if value_idx < len(values):
+                value = values[value_idx]
+                converted.append(self._convert_value(value, column))
         
         return converted
     
@@ -487,7 +564,7 @@ class CsvMpParser:
         
         return part, line_index + 1
     
-    def _validate_references(self, manifest: List[ManifestEntry], tables: List[Table]):
+    def _validate_references(self, manifest: List[ManifestEntry], tables: List[TablePart]):
         """Validate references between tables"""
         # Build a set of valid references
         valid_refs = set()
@@ -508,7 +585,7 @@ class CsvMpParser:
                                 if f'@{part_name}' not in valid_refs:
                                     raise ReferenceException(f"Reference '{ref_value}' not found")
     
-    def serialize(self, manifest: List[ManifestEntry], tables: List[Table], 
+    def serialize(self, manifest: List[ManifestEntry], tables: List[TablePart], 
                   binary_parts: Optional[List[BinaryPart]] = None,
                   text_parts: Optional[List[TextPart]] = None) -> str:
         """Serialize CSV-MP data to string"""
@@ -606,7 +683,7 @@ def parse(content: str, config: Optional[ValidationConfig] = None) -> Dict[str, 
     return parser.parse(content)
 
 
-def serialize(manifest: List[ManifestEntry], tables: List[Table],
+def serialize(manifest: List[ManifestEntry], tables: List[TablePart],
               binary_parts: Optional[List[BinaryPart]] = None,
               text_parts: Optional[List[TextPart]] = None,
               config: Optional[ValidationConfig] = None) -> str:
@@ -656,7 +733,7 @@ def to_csv_mp(data: Dict[str, Any], options: Optional[Dict[str, str]] = None) ->
     version = options.get('version', '0.2') if options else '0.2'
     
     manifest: List[ManifestEntry] = []
-    tables: List[Table] = []
+    tables: List[TablePart] = []
     part_index = 0
     
     for key, value in data.items():
@@ -700,7 +777,7 @@ def to_csv_mp(data: Dict[str, Any], options: Optional[Dict[str, str]] = None) ->
                     row_array.append(row[col.name])
                 rows.append(row_array)
             
-            table = Table(
+            table = TablePart(
                 name=key,
                 columns=columns,
                 rows=rows,
